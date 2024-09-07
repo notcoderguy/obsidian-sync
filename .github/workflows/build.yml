@@ -1,4 +1,4 @@
-name: Build and Upload to GitHub Packages
+name: Build and Upload to GitHub Releases
 
 on:
   push:
@@ -29,16 +29,13 @@ jobs:
           pyinstaller --onefile --noconsole auto_git_commit.py
           ls -la dist
 
-      - name: Prepare Package for GitHub Packages
-        run: |
-          mkdir -p package-linux
-          mv dist/auto_git_commit package-linux/
-          echo '{"name":"auto-git-commit-linux","version":"1.0.0"}' > package-linux/package.json
-
-      - name: Publish to GitHub Packages (Linux)
-        run: npm publish --access public ./package-linux/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+      - name: Upload Linux Executable to GitHub Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/auto_git_commit
+          asset_name: auto_git_commit-linux
+          asset_content_type: application/octet-stream
 
   build_windows:
     runs-on: windows-latest
@@ -62,13 +59,25 @@ jobs:
           pyinstaller --onefile --noconsole auto_git_commit.py
           ls -la dist
 
-      - name: Prepare Package for GitHub Packages
-        run: |
-          mkdir -p package-windows
-          mv dist/auto_git_commit.exe package-windows/
-          echo '{"name":"auto-git-commit-windows","version":"1.0.0"}' > package-windows/package.json
+      - name: Upload Windows Executable to GitHub Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/auto_git_commit.exe
+          asset_name: auto_git_commit-windows.exe
+          asset_content_type: application/octet-stream
 
-      - name: Publish to GitHub Packages (Windows)
-        run: npm publish --access public ./package-windows/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v1.0.0
+          release_name: v1.0.0
+          draft: false
+          prerelease: false
