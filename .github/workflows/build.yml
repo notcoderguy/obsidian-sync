@@ -24,16 +24,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
 
-      - name: Add Timestamp to Python File
-        run: |
-          TIMESTAMP=$(date)
-          echo "# Build timestamp: $TIMESTAMP" >> auto_git_commit.py
-          echo "Timestamp added: $TIMESTAMP"
-        
       - name: Build Linux Executable
         run: |
           pyinstaller --onefile --noconsole auto_git_commit.py
           ls -la dist
+
+      - name: Create a Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: "Build v1.0.${{ github.run_number }}"
+          body: "Release for build v1.0.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Linux Executable to Release
         uses: actions/upload-release-asset@v1
@@ -60,16 +66,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
 
-      - name: Add Timestamp to Python File
-        run: |
-          TIMESTAMP=$(date)
-          echo "# Build timestamp: $TIMESTAMP" >> auto_git_commit.py
-          echo "Timestamp added: $TIMESTAMP"
-        
       - name: Build Windows Executable
         run: |
           pyinstaller --onefile --noconsole auto_git_commit.py
-          ls -la dist  # List the contents of dist to confirm .exe file
+          ls -la dist  # Check for dist folder and executables
+
+      - name: Create a Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: "Build v1.0.${{ github.run_number }}"
+          body: "Release for build v1.0.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Windows Executable to Release
         uses: actions/upload-release-asset@v1
@@ -78,4 +90,3 @@ jobs:
           asset_path: dist/auto_git_commit.exe
           asset_name: auto_git_commit_windows.exe
           asset_content_type: application/octet-stream
-
