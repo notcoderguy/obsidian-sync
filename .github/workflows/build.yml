@@ -18,8 +18,8 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: v1.0.0
-          release_name: v1.0.0
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: v1.0.${{ github.run_number }}
           draft: false
           prerelease: false
         env:
@@ -81,7 +81,6 @@ jobs:
       - name: Build Windows Executable
         run: |
           pyinstaller --onefile --noconsole auto_git_commit.py
-          ls -la dist
 
       - name: Upload Windows Executable to GitHub Release
         uses: actions/upload-release-asset@v1
