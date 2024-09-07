@@ -33,12 +33,14 @@ jobs:
       - name: Build Windows Executable
         run: |
           pyinstaller --onefile --noconsole auto_git_commit.py
+          ls -la dist  # List the contents of the dist directory
         env:
           OS: Windows
 
       - name: Build Linux Executable
         run: |
           pyinstaller --onefile --noconsole auto_git_commit.py
+          ls -la dist  # List the contents of the dist directory
 
       - name: Create a Release
         id: create_release
