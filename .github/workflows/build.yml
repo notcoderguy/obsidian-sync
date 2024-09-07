@@ -55,7 +55,6 @@ jobs:
       - name: Build Windows Executable
         run: |
           pyinstaller --onefile --noconsole auto_git_commit.py
-          ls -la dist
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
