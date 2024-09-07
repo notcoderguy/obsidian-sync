@@ -95,6 +95,7 @@ python auto_git_commit.py --dir /path/to/your/directory --timer 300
    ExecStart=/usr/local/bin/auto_git_commit --dir /path/to/your/directory --timer 300
    WorkingDirectory=/path/to/your/directory
    Restart=always
+   User={ENTER YOUR USER}
 
    [Install]
    WantedBy=multi-user.target
