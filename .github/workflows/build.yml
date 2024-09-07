@@ -1,0 +1,69 @@
+name: Build Executables
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Add Timestamp to Python File
+        run: |
+          TIMESTAMP=$(date)
+          echo "# Build timestamp: $TIMESTAMP" >> auto_git_commit.py
+          echo "Timestamp added: $TIMESTAMP"
+        
+      - name: Build Windows Executable
+        run: |
+          pyinstaller --onefile --noconsole auto_git_commit.py
+        env:
+          OS: Windows
+
+      - name: Build Linux Executable
+        run: |
+          pyinstaller --onefile --noconsole auto_git_commit.py
+
+      - name: Upload Executables
+        uses: actions/upload-artifact@v3
+        with:
+          name: executables
+          path: |
+            dist/auto_git_commit.exe
+            dist/auto_git_commit
+
+  update-commit-message:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set timestamp
+        id: timestamp
+        run: echo "TIMESTAMP=$(date)" >> $GITHUB_ENV
+
+      - name: Update commit message with timestamp
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git commit --amend -m "Automated build with timestamp ${{ env.TIMESTAMP }}"
+
+      - name: Push amended commit
+        run: git push origin HEAD --force
