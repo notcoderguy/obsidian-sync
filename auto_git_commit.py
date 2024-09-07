@@ -34,6 +34,14 @@ def git_commit(base_dir):
     else:
         print("No changes to commit")
 
+def git_push(base_dir):
+    os.chdir(base_dir)
+    subprocess.run(['git', 'push'])
+
+def git_pull(base_dir):
+    os.chdir(base_dir)
+    subprocess.run(['git', 'pull'])
+
 def main():
     parser = argparse.ArgumentParser(description="Auto Git Commit Script")
     parser.add_argument('--dir', required=True, help='Directory to monitor for git commits')
@@ -44,10 +52,12 @@ def main():
     base_dir = args.dir
     sleep_timer = args.timer
 
-    add_gitkeep_files(base_dir)
 
     while True:
+        git_pull(base_dir)
+        add_gitkeep_files(base_dir)
         git_commit(base_dir)
+        git_push(base_dir)
         time.sleep(sleep_timer)
 
 if __name__ == "__main__":
